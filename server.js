@@ -5,12 +5,12 @@ const formidable = require("express-formidable");
 
 // NoSQL setup
 const mongoose = require("mongoose");
-const mongourl = "no";
+const mongourl = process.env.MONGO_URL;
 
 // Connect to MongoDB
 mongoose.connect(mongourl)
     .then(() => console.log("Connected to MongoDB"))
-    .catch(err => console.error("MongoDB connection error:", err));
+    .catch(err => console.log("MongoDB connection error:", err));
 
 app.set("view engine", "ejs");
 app.use(formidable());
@@ -22,7 +22,6 @@ app.use(session({
 // Models
 const User = require("./models/User");
 const Book = require("./models/Book");
-const { ObjectId } = require("bson");
 
 // Middleware (Login)
 function loginRequired(req, res, next) {
@@ -54,7 +53,7 @@ async function validateBookAndUser(req, res, next) {
 
         next();
     } catch (error) {
-        console.error(error);
+        console.log(error);
         res.status(500).send(error);
     }
 }
@@ -87,12 +86,12 @@ app.post("/login", async (req, res) => {
             req.session.username = req.fields.username;
             res.redirect("/dashboard");
         }
-        else { // failed, redirect back to login
+        else { // failed
             res.end("Wrong username or password, please go back and retry again...");
         }
 
     } catch (error) {
-        console.error(error);
+        console.log(error);
         res.status(500).send(error);
     }
 });
@@ -110,8 +109,38 @@ app.get("/dashboard", loginRequired, async (req, res) => {
             borrowedBooks: user ? user.borrowedBooks : []
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).send("An error has occurred");
+        console.log(error);
+        res.status(500).send(error);
+    }
+});
+
+app.get("/updateUsername", loginRequired, async (req, res) => {
+    try {
+        res.status(200).render("updateUsername", {
+            user: { username: req.session.username }
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+});
+
+app.post("/updateUsername", loginRequired, async (req, res) => {
+    try {
+        if (await User.findOne({ userName: req.fields.newName })) {
+            return res.end("Username already taken, please go back and choose another one...");
+        }
+        
+        await User.updateOne(
+            { userName: req.session.username },
+            { userName: req.fields.newName }
+        );
+
+        req.session.username = req.fields.newName;
+        res.redirect("/dashboard");
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
     }
 });
 
@@ -130,8 +159,8 @@ app.get("/borrowBook", loginRequired, async (req, res) => {
             user: { username: req.session.username }
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).send("An error has occurred");
+        console.log(error);
+        res.status(500).send(error);
     }
 });
 
@@ -152,8 +181,8 @@ app.post("/borrow-book", loginRequired, validateBookAndUser, async (req, res) =>
 
         res.redirect("/dashboard");
     } catch (error) {
-        console.error(error);
-        res.status(500).send("An error has occurred");
+        console.log(error);
+        res.status(500).send(error);
     }
 });
 
@@ -169,8 +198,8 @@ app.post("/return-book", loginRequired, validateBookAndUser, async (req, res) =>
 
         res.redirect("/dashboard");
     } catch (error) {
-        console.error(error);
-        res.status(500).send("An error has occurred");
+        console.log(error);
+        res.status(500).send(error);
     }
 });
 
@@ -194,7 +223,7 @@ app.get("/api/user", async (req, res) => {
     try {
         res.status(200).json(await User.find());
     } catch (error) {
-        console.error(error);
+        console.log(error);
         res.status(500).send(error);
     }
 });
@@ -203,7 +232,39 @@ app.get("/api/user/:username", async (req, res) => {
     try {
         res.status(200).json(await User.find({ userName: req.params.username }));
     } catch (error) {
-        console.error(error);
+        console.log(error);
+        res.status(500).send(error);
+    }
+});
+
+app.post("/api/user", async (req, res) => {
+    try {
+        const newUser = new User({
+            userName: req.fields.userName,
+            password: req.fields.password,
+            borrowedBooks: []
+        });
+
+        await newUser.save();
+        res.status(200).json({ status: "success" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+});
+
+// Update username to new user
+app.put("/api/user/:username", async (req,res) => {
+    try {
+        const newName = req.fields.newName;
+        await User.updateOne(
+            { userName: req.params.username },
+            { userName: newName }
+        );
+
+        res.status(200).json({ status: "success" });
+    } catch (error) {
+        console.log(error);
         res.status(500).send(error);
     }
 });
@@ -212,7 +273,7 @@ app.get("/api/user/:username/books", async (req, res) => {
     try {
         res.status(200).json(await User.find( {userName: req.params.username }).populate('borrowedBooks'));
     } catch (error) {
-        console.error(error);
+        console.log(error);
         res.status(500).send(error);
     }
 });
@@ -255,7 +316,7 @@ app.delete("/api/user/:username/books/:bookid", validateBookAndUser, async (req,
         res.status(200).json({ status: "success" });
 
     } catch (error) {
-        console.error(error);
+        console.log(error);
         res.status(500).send(error);
     }
 });
@@ -263,7 +324,6 @@ app.delete("/api/user/:username/books/:bookid", validateBookAndUser, async (req,
 //
 //  /api/books
 //
-
 app.get("/api/books", async (req, res) => {
     try {
         const canBorrow = req.query.canBorrow;
@@ -281,7 +341,29 @@ app.get("/api/books", async (req, res) => {
 
         res.status(200).json(await Book.find());
     } catch (error) {
-        console.error(error);
+        console.log(error);
+        res.status(500).send(error);
+    }
+});
+
+app.post("/api/books", async(req, res) => {
+    try {
+        if (await Book.findOne({ title: req.fields.title, author: req.fields.author })) {
+            return res.status(400).json({ error: "Book already exists" });
+        }
+
+        const newBook = new Book({
+            title: req.fields.title,
+            author: req.fields.author,
+            publishedYear: req.fields.publishedYear,
+            lastBorrowDate: null
+        });
+
+        await newBook.save();
+        res.status(200).json({ status: "success" });
+        
+    } catch (error) {
+        console.log(error);
         res.status(500).send(error);
     }
 });
@@ -290,7 +372,7 @@ app.get("/api/books/:id", async (req, res) => {
     try {
         res.status(200).json(await Book.findById(req.params.id));
     } catch (error) {
-        console.error(error);
+        console.log(error);
         res.status(500).send(error);
     }
 });
