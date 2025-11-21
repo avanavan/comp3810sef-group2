@@ -36,13 +36,16 @@
 curl -X POST http://localhost:8000/api/user \
   -d "userName=user3" \
   -d "password=user3password"
+
+curl -X POST http://localhost:8000/api/user/user3/books/69202a9b893f148c069dc2b8
 ```
 
 **GET (READ) CURL**
 ```bash
+curl -X GET http://localhost:8000/api/user
 curl -X GET http://localhost:8000/api/books
 curl -X GET http://localhost:8000/api/books?canBorrow=true
-curl -X GET http://localhost:8000/api/books?canBorrow=false
+curl -X GET http://localhost:8000/api/books/69202a9b893f148c069dc2b8
 ```
 
 **PUT (UPDATE) CURL**
@@ -53,5 +56,6 @@ curl -X PUT http://localhost:8000/api/user/user3 \
 
 **DELETE (DELETE) CURL**
 ```bash
+curl -X DELETE http://localhost:8000/api/user/USER3/books/69202a9b893f148c069dc2b8
 curl -X DELETE http://localhost:8000/api/user/USER3
 ```
