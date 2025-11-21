@@ -42,10 +42,10 @@ curl -X POST http://localhost:8000/api/user/user3/books/69202a9b893f148c069dc2b8
 
 **GET (READ) CURL**
 ```bash
-curl -X GET http://localhost:8000/api/user
-curl -X GET http://localhost:8000/api/books
-curl -X GET http://localhost:8000/api/books?canBorrow=true
-curl -X GET http://localhost:8000/api/books/69202a9b893f148c069dc2b8
+curl -X GET http://localhost:8000/api/user | jq.
+curl -X GET http://localhost:8000/api/books | jq .
+curl -X GET http://localhost:8000/api/books?canBorrow=true | jq .
+curl -X GET http://localhost:8000/api/books/69202a9b893f148c069dc2b8 | jq .
 ```
 
 **PUT (UPDATE) CURL**
@@ -56,6 +56,6 @@ curl -X PUT http://localhost:8000/api/user/user3 \
 
 **DELETE (DELETE) CURL**
 ```bash
-curl -X DELETE http://localhost:8000/api/user/USER3/books/69202a9b893f148c069dc2b8
-curl -X DELETE http://localhost:8000/api/user/USER3
+curl -X DELETE http://localhost:8000/api/user/USER3/books/69202a9b893f148c069dc2b8 | jq .
+curl -X DELETE http://localhost:8000/api/user/USER3 | jq .
 ```
