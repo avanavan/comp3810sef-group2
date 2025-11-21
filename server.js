@@ -254,7 +254,7 @@ app.post("/api/user", async (req, res) => {
 });
 
 // Update username to new user
-app.put("/api/user/:username", async (req,res) => {
+app.put("/api/user/:username", async (req, res) => {
     try {
         const newName = req.fields.newName;
         await User.updateOne(
@@ -262,6 +262,22 @@ app.put("/api/user/:username", async (req,res) => {
             { userName: newName }
         );
 
+        res.status(200).json({ status: "success" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+});
+
+// delete a user
+app.delete("/api/user/:username", async (req, res) => {
+    try {
+        if (!User.findOne({ userName: req.params.username })) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        await User.deleteOne({ userName: req.params.username });
+        
         res.status(200).json({ status: "success" });
     } catch (error) {
         console.log(error);

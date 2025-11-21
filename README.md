@@ -28,4 +28,30 @@
 - `GET /api/books/:id` - Get book by ID
 - `PUT /api/user/:username` - Update user information
   - Form: `{ newUsername }`
+- `DELETE /api/user/:username` - Delete a user
 - `DELETE /api/user/:username/books/:bookid` - Remove a borrowed book from user
+
+**POST (CREATE) CURL**
+```bash
+curl -X POST http://localhost:8000/api/user \
+  -d "userName=user3" \
+  -d "password=user3password"
+```
+
+**GET (READ) CURL**
+```bash
+curl -X GET http://localhost:8000/api/books
+curl -X GET http://localhost:8000/api/books?canBorrow=true
+curl -X GET http://localhost:8000/api/books?canBorrow=false
+```
+
+**PUT (UPDATE) CURL**
+```bash
+curl -X PUT http://localhost:8000/api/user/user3 \
+  -d "newName=USER3"
+```
+
+**DELETE (DELETE) CURL**
+```bash
+curl -X DELETE http://localhost:8000/api/user/USER3
+```
