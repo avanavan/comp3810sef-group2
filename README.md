@@ -1,4 +1,29 @@
 # COMP3810SEF - Group 2 (Simple Library System)
+Hong Kong Metropolitan University COMP3810SEF Group Project, not meant to be used in production.
+```
+Group Members:
+  Lau Chun Kit 13897100
+  Lee Chun Yin 14007429
+  Chong Tsz Ho 13990354
+  Fung Ming Chu 14201890
+```
+> Currently Serving on https://comp3810sef.avanlcy.hk
+
+## User flow
+1. Login via with predefined credential `Username: user1` `Password: user1password` and hit submit **(READ)**.
+2. After entering the dashboard, click ***Update Username*** button and change username and hit `update` **(Update)**.
+3. Click ***Return Home*** button and click ***Borrow Book*** button and click `Borrow` **(CREATE)** on a random book to borrow the book.
+4. When returned to the dashboard, click `Return` **(DELETE)** to return the book from user's possession.
+5. Hit ***Logout*** to clear cookie-session.
+
+If the user or administrator wants to access the data from an API, they are able to use our RESTful API endpoints below programmatically.
+
+## Functions
+This library system is designed to be simple and straight forward, we have also included many error handling and checking on our EJS endpoints as well as our RESTful API to prevent any interruption during runtime. In addition, we have also made sure the RESTful API endpoints are all stateless.
+
+For the ease of deployment, we have also used **docker** to streamline our deployment process and isolate their environment, which will then be deployed to **Google Cloud's Serverless platform, Cloud Run** to handle the automatic scaling and traffic routing.
+
+## EJS endpoints
 > Need to satisfy CRUD (Create, Read, Update, Delete)
 
 - `GET /` - Home page (redirects to login or dashboard)
