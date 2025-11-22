@@ -13,6 +13,7 @@ mongoose.connect(mongourl)
     .catch(err => console.log("MongoDB connection error:", err));
 
 app.set("view engine", "ejs");
+app.use(express.static("public"));
 app.use(formidable());
 app.use(session({
     name: "loginSession",
